@@ -54,7 +54,7 @@ impl Spawner {
             future: Mutex::new(Some(future)),
             task_sender: self.task_sender.clone(),
         });
-        self.task_sender.try_send(task).expect("too many tasks queued");
+        self.task_sender.send(task).expect("too many tasks queued");
     }
 }
 
@@ -65,10 +65,11 @@ impl ArcWake for Task {
         let cloned = arc_self.clone();
         arc_self
             .task_sender
-            .try_send(cloned)
+            .send(cloned)
             .expect("too many tasks queued");
     }
 }
+
 
 impl Executor {
     fn run(&self) {
@@ -99,12 +100,13 @@ fn main() {
 
     // Spawn a task to print before and after waiting on a timer.
     spawner.spawn(async {
-        println!("Darren's Komputer: howdy!");
+        println!("Darren's Computer: howdy!");
         // Wait for our timer future to complete after two seconds.
         TimerFuture::new(Duration::new(2, 0)).await;
-        println!("Darren's Komputer: done!");
+        println!("Darren's Computer: done!");
     });
 
+    println!("Darren's Computer: hey hey");
     // Drop the spawner so that our executor knows it is finished and won't
     // receive more incoming tasks to run.
     drop(spawner);
