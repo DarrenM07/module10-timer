@@ -52,3 +52,10 @@ This experiment shows that the line **after** the `spawn()` call (`"hey hey"`) r
 - The **main thread continues** right after `spawn()` without waiting.
 - Futures in Rust are **lazy**; they only run when polled by an executor.
 - This illustrates the **non-blocking** nature of Rust's async model, which is great for efficiently handling many concurrent or I/O-bound tasks.
+
+With drop(spawner):
+![With Drop](img/ss3.png)
+
+Without drop(spawner):
+![Without Drop](img/ss2.png)
+Calling `drop(spawner)` tells the program no more tasks will be added, so it waits for all tasks to finish. Without it, the executor keeps waiting for new tasks, which can cause tasks to finish out of order. This highlights the importance of closing the spawner to ensure proper task execution and message order.
